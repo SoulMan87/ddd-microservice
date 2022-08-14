@@ -10,7 +10,7 @@ public interface PersistenceOperationOutputPort {
 
     Integer persist(Course course);
 
-    Course obtainCourseById(Integer id);
+    Course obtainCourseById(Integer courseId);
 
     boolean courseExistWithTitle(String title);
 

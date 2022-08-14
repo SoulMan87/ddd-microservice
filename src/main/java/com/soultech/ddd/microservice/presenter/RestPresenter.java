@@ -1,6 +1,6 @@
 package com.soultech.ddd.microservice.presenter;
 
-import com.soultech.ddd.microservice.exception.EntityDoesExistError;
+import com.soultech.ddd.microservice.exception.EntityDoesNotExistError;
 import com.soultech.ddd.microservice.port.RestPresenterOutputPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,7 @@ public class RestPresenter implements RestPresenterOutputPort {
         final DelegatingServerHttpResponse httpOutputMessage =
                 new DelegatingServerHttpResponse(new ServletServerHttpResponse(httpServletResponse));
 
-        if (t instanceof EntityDoesExistError) {
+        if (t instanceof EntityDoesNotExistError) {
             httpOutputMessage.setStatusCode(HttpStatus.BAD_REQUEST);
         } else {
             httpOutputMessage.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);

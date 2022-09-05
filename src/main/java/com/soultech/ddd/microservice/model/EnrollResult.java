@@ -11,6 +11,5 @@ import lombok.Value;
 public class EnrollResult {
 
     Student student;
-
     boolean courseAdded;
 }

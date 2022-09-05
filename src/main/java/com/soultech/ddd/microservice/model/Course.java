@@ -23,8 +23,8 @@ public class Course {
     public Course(Integer id, String title, Integer numberOfStudents) {
         this.id = id;
         this.title = Optional.ofNullable(title)
-                .filter(t -> !toString().isBlank())
-                .orElseThrow(() -> new IllegalArgumentException("Title is null or empty"));
+                .filter(t -> !t.isBlank())
+                .orElseThrow(() -> new IllegalArgumentException("El titulo no puede ser nulo o vacido"));
         this.numberOfStudents = Optional.ofNullable(numberOfStudents)
                 .map(AtomicInteger::new).orElse(new AtomicInteger(0));
     }
@@ -34,17 +34,15 @@ public class Course {
     }
 
     public Course enrollStudent() {
-
+        // notese que no se está mutando la instancia del contador acá
         return newCourse().numberOfStudents(numberOfStudents.get() + 1).build();
     }
 
     private CourseBuilder newCourse() {
-
         return Course.builder()
                 .id(id)
                 .title(title)
                 .numberOfStudents(numberOfStudents.get());
     }
-
 
 }

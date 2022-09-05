@@ -18,9 +18,9 @@ import javax.persistence.Table;
 import java.util.Set;
 
 
-@Entity
-@Setter
 @Getter
+@Setter
+@Entity
 @Table(name = "student")
 @Builder
 @NoArgsConstructor
@@ -32,6 +32,7 @@ public class StudentEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
+    @Column
     private String fullName;
 
     @ElementCollection

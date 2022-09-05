@@ -25,10 +25,11 @@ public class Student {
 
     @Builder
     public Student(Integer id, String fullName, Set<Integer> coursesIds) {
+
         this.id = id;
         this.fullName = Optional.ofNullable(fullName)
-                .filter(name -> !name.isBlank())
-                .orElseThrow(() -> new IllegalArgumentException("Full name is null or empty"));
+                .filter(f -> !f.isBlank())
+                .orElseThrow(() -> new IllegalArgumentException("El nombre no puede ser nulo o vacido"));
         this.coursesIds = Optional.ofNullable(coursesIds)
                 .map(Collections::unmodifiableSet).orElse(Set.of());
     }

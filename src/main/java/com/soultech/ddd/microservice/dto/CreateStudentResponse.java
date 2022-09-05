@@ -10,6 +10,5 @@ import lombok.Data;
 public class CreateStudentResponse {
 
     Boolean existsAlready;
-
     Integer studentId;
 }

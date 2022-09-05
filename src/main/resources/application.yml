@@ -2,13 +2,6 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
-
-datasource:
-  url: jdbc:h2:mem:example-app;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-  platform: h2
-  username: sa
-  password:
-  driverClassName: org.h2.Driver
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
@@ -18,6 +11,13 @@ datasource:
         show_sql: true
         use_sql_comments: true
         format_sql: true
+datasource:
+  platform: h2
+  url: jdbc:h2:mem:ddd-app
+  username: sa
+  password:
+  driverClassName: org.h2.Driver
+
 
   h2:
     console:
@@ -35,4 +35,6 @@ logging:
   level:
     org.springframework.orm: DEBUG
 
-
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

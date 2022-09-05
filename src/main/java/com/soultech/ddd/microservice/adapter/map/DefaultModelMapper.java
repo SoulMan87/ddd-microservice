@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DefaultModelMapper implements ModelMapper {
-
-
     @Override
     public Course map(CourseEntity entity) {
         return Course.builder()

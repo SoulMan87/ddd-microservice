@@ -18,34 +18,40 @@ import org.springframework.web.context.WebApplicationContext;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class EnrollmentController {
 
-    private final WebApplicationContext appContext;
+    final WebApplicationContext appContext;
 
     @PostMapping("/create-course")
     public void createCourse(@RequestBody CreateCourseRequest createCourseRequest) {
-        final EnrollStudentInputPort enrollmentStudentUseCase = getUseCase();
-        enrollmentStudentUseCase.createCourse(createCourseRequest.getTitle());
+        final EnrollStudentInputPort enrollStudentUseCase = getUseCase();
+        enrollStudentUseCase.createCourse(createCourseRequest.getTitle());
     }
 
     @PostMapping("/create-student")
     public void createStudent(@RequestBody CreateStudentRequest createStudentRequest) {
-        final EnrollStudentInputPort enrollmentStudentUseCase = getUseCase();
-        enrollmentStudentUseCase.createStudent(createStudentRequest.getFullName());
+        final EnrollStudentInputPort enrollStudentUseCase = getUseCase();
+        enrollStudentUseCase.createStudent(createStudentRequest.getFullName());
     }
 
     @PostMapping("/enroll")
     public void enroll(@RequestBody EnrollRequest enrollRequest) {
-        final EnrollStudentInputPort enrollmentStudentUseCase = getUseCase();
-        enrollmentStudentUseCase.enroll(enrollRequest.getStudentId(),
+        final EnrollStudentInputPort enrollStudentUseCase = getUseCase();
+        enrollStudentUseCase.enroll(enrollRequest.getCourseId(),
                 enrollRequest.getStudentId());
     }
 
     @PostMapping("/enrollments")
     public void enrollments(@RequestBody EnrollmentsQuery enrollmentsQuery) {
-        final EnrollStudentInputPort enrollmentStudentUseCase = getUseCase();
-        enrollmentStudentUseCase.findEnrollmentsForStudent(enrollmentsQuery.getStudentId());
+        final EnrollStudentInputPort enrollStudentUseCase = getUseCase();
+        enrollStudentUseCase.findEnrollmentsForStudent(enrollmentsQuery.getStudentId());
     }
 
+    /*
+       Se obtiene el prototipo de caso de uso del bean desde el web application context.
+    */
     private EnrollStudentInputPort getUseCase() {
         return appContext.getBean(EnrollStudentInputPort.class);
     }
+
+
+
 }

@@ -24,28 +24,32 @@ public class RestPresenter implements RestPresenterOutputPort {
 
     private final MappingJackson2HttpMessageConverter jacksonConverter;
 
+    //REST presenter de clean architecture
+    //copiado desde https://github.com/SoulMan87/ddd-clean-rest
     @Override
     public <T> void presentOk(T content) {
 
-        final DelegatingServerHttpResponse httOutputMessage =
+        final DelegatingServerHttpResponse httpOutputMessage =
                 new DelegatingServerHttpResponse(new ServletServerHttpResponse(httpServletResponse));
 
-        httOutputMessage.setStatusCode(HttpStatus.OK);
+        httpOutputMessage.setStatusCode(HttpStatus.OK);
 
         try {
-            jacksonConverter.write(content, MediaType.APPLICATION_JSON, httOutputMessage);
+            jacksonConverter.write(content, MediaType.APPLICATION_JSON, httpOutputMessage);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     @Override
-    public void presenterError(Throwable t) {
+    public void presentError(Throwable t) {
 
+        //metodo que hace un rollback si es necesario
         try {
             TransactionInterceptor.currentTransactionStatus().setRollbackOnly();
         } catch (NoTransactionException e) {
-
+            //no hace nada si no se ejecuta en ninguna transacion
         }
 
         final DelegatingServerHttpResponse httpOutputMessage =
@@ -58,11 +62,10 @@ public class RestPresenter implements RestPresenterOutputPort {
         }
 
         try {
-            jacksonConverter.write(Map.of("Error", Optional.ofNullable(t.getMessage()).orElse("null")),
+            jacksonConverter.write(Map.of("error", Optional.ofNullable(t.getMessage()).orElse("null")),
                     MediaType.APPLICATION_JSON, httpOutputMessage);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 }

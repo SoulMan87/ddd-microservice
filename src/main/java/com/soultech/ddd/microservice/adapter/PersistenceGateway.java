@@ -8,7 +8,7 @@ import com.soultech.ddd.microservice.exception.EntityDoesNotExistError;
 import com.soultech.ddd.microservice.model.Course;
 import com.soultech.ddd.microservice.model.Enrollment;
 import com.soultech.ddd.microservice.model.Student;
-import com.soultech.ddd.microservice.port.PersistenceOperationOutputPort;
+import com.soultech.ddd.microservice.port.PersistenceOperationsOutputPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -22,14 +22,11 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class PersistenceGateWay implements PersistenceOperationOutputPort {
+public class PersistenceGateway implements PersistenceOperationsOutputPort {
 
     final CourseEntityRepository courseRepo;
-
     final StudentEntityRepository studentRepo;
-
     final NamedParameterJdbcOperations jdbcOps;
-
     final ModelMapper mapper;
 
     @Override
@@ -38,16 +35,16 @@ public class PersistenceGateWay implements PersistenceOperationOutputPort {
     }
 
     @Override
-    public Course obtainCourseById(Integer courseId) {
+    public Course obtainCourseById(Integer courseId) throws EntityDoesNotExistError {
         try {
-            return mapper.map(courseRepo.getReferenceById(courseId));
+            return mapper.map(courseRepo.getById(courseId));
         } catch (EntityNotFoundException e) {
-            throw new EntityDoesNotExistError("Could not find Course with Id: %d".formatted(courseId));
+            throw new EntityDoesNotExistError("No se pudo encontrar el curso con Id: %d".formatted(courseId));
         }
     }
 
     @Override
-    public boolean courseExistWithTitle(String title) {
+    public boolean courseExistsWithTitle(String title) {
         return courseRepo.existsCourseEntityByTitleLike(title);
     }
 
@@ -57,11 +54,11 @@ public class PersistenceGateWay implements PersistenceOperationOutputPort {
     }
 
     @Override
-    public Student obtainStudentById(Integer studentId) {
+    public Student obtainStudentById(Integer studentId) throws EntityDoesNotExistError {
         try {
-            return mapper.map(studentRepo.getReferenceById(studentId));
+            return mapper.map(studentRepo.getById(studentId));
         } catch (EntityNotFoundException e) {
-            throw new EntityDoesNotExistError("Could not find Student with Id: %d".formatted(studentId));
+            throw new EntityDoesNotExistError("No se pudo encontrar el estudiante con el Id: %d".formatted(studentId));
         }
     }
 
@@ -72,6 +69,7 @@ public class PersistenceGateWay implements PersistenceOperationOutputPort {
 
     @Override
     public Set<Enrollment> findEnrollments(Integer studentId) {
+
         return jdbcOps.queryForStream(EnrollmentRow.SQL,
                         Map.of("studentId", studentId),
                         new BeanPropertyRowMapper<>(EnrollmentRow.class))

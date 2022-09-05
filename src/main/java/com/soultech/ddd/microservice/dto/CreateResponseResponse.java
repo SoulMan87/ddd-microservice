@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL) //omite campos nulos https://www.baeldung.com/jackson-ignore-null-fields
 public class CreateResponseResponse {
 
     Boolean existsAlready;

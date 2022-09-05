@@ -6,7 +6,7 @@ import com.soultech.ddd.microservice.model.Course;
 import com.soultech.ddd.microservice.model.EnrollResult;
 import com.soultech.ddd.microservice.model.Student;
 import com.soultech.ddd.microservice.port.EnrollStudentInputPort;
-import com.soultech.ddd.microservice.port.PersistenceOperationOutputPort;
+import com.soultech.ddd.microservice.port.PersistenceOperationsOutputPort;
 import com.soultech.ddd.microservice.port.RestPresenterOutputPort;
 
 import javax.transaction.Transactional;
@@ -15,9 +15,9 @@ public class EnrollStudentUseCase implements EnrollStudentInputPort {
 
     private final RestPresenterOutputPort restPresenter;
 
-    private final PersistenceOperationOutputPort persistenceOps;
+    private final PersistenceOperationsOutputPort persistenceOps;
 
-    public EnrollStudentUseCase(RestPresenterOutputPort restPresenter, PersistenceOperationOutputPort persistenceOps) {
+    public EnrollStudentUseCase(RestPresenterOutputPort restPresenter, PersistenceOperationsOutputPort persistenceOps) {
         this.restPresenter = restPresenter;
         this.persistenceOps = persistenceOps;
     }
@@ -25,7 +25,8 @@ public class EnrollStudentUseCase implements EnrollStudentInputPort {
     @Override
     @Transactional
     public void createCourse(String title) {
-        if (persistenceOps.courseExistWithTitle(title)) {
+
+        if (persistenceOps.courseExistsWithTitle(title)) {
             restPresenter.presentOk(CreateCourseResponse.builder().existsAlready(true));
         } else {
             final Integer courseId = persistenceOps.persist(Course.builder()
@@ -39,8 +40,11 @@ public class EnrollStudentUseCase implements EnrollStudentInputPort {
         }
     }
 
+
     @Override
+    @Transactional
     public void createStudent(String fullName) {
+
         if (persistenceOps.studentExistsWithFullName(fullName)) {
             restPresenter.presentOk(CreateStudentResponse.builder().existsAlready(true).build());
         } else {
@@ -51,21 +55,22 @@ public class EnrollStudentUseCase implements EnrollStudentInputPort {
             restPresenter.presentOk(CreateStudentResponse.builder().existsAlready(false)
                     .studentId(studentId)
                     .build());
-
         }
-
     }
 
     @Transactional
     @Override
     public void enroll(Integer courseId, Integer studentId) {
-
         try {
 
+            //intenta matricular al estudiante en el curso
             final Student student = persistenceOps.obtainStudentById(studentId);
             final EnrollResult enrollResult = student.enrollInCourse(courseId);
 
+            //continua solo si la matricula ha resultado en un nuevo
+            //curso sumado a los cursos del estudiante
             if (enrollResult.isCourseAdded()) {
+
                 persistenceOps.persist(enrollResult.getStudent());
 
                 final Course course = persistenceOps.obtainCourseById(courseId);
@@ -73,10 +78,10 @@ public class EnrollStudentUseCase implements EnrollStudentInputPort {
                 persistenceOps.persist(updatedCourse);
             }
 
+            //afianza el resultado de la matricula
             restPresenter.presentOk(enrollResult);
-
         } catch (Exception e) {
-            restPresenter.presenterError(e);
+            restPresenter.presentError(e);
         }
 
     }
